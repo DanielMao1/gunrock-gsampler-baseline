@@ -99,6 +99,7 @@ struct main_struct {
             int num_neigh2 = parameters.Get<int>("num-leafs-per-child");
             if (!util::isValid(num_neigh2)) num_neigh2 = num_neigh1;
             int batch_size = parameters.Get<int>("batch-size");
+            int batchnum = parameters.Get<int>("batchnum");
 
             ValueT **W_f_1 = app::sage::template ReadMatrix<ValueT, SizeT>(
                 wf1_file, Wf1_dim_0, Wf1_dim_1);

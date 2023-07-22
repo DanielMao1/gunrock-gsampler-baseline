@@ -97,6 +97,7 @@ struct Problem : ProblemBase<_GraphT, _FLAG> {
     util::Array1D<SizeT, VertexT> children;  // children vertices
 
     VertexT batch_size;
+    int batchnum;
     int feature_column;
     int num_children_per_source;
     int num_leafs_per_child;
@@ -375,6 +376,7 @@ struct Problem : ProblemBase<_GraphT, _FLAG> {
 
       auto &data_slice = data_slices[gpu][0];
       data_slice.batch_size = para.template Get<int>("batch-size");
+      data_slice.batchnum=para.template Get<int>("batchnum");
       data_slice.feature_column = para.template Get<int>("feature-column");
       data_slice.num_children_per_source =
           para.template Get<int>("num-children-per-source");
@@ -396,39 +398,39 @@ struct Problem : ProblemBase<_GraphT, _FLAG> {
 
       GUARD_CU(data_slice.Init(this->sub_graphs[gpu], this->num_gpus,
                                this->gpu_idx[gpu], target, this->flag));
+      //skip weight loading
+      // std::string Wf1_filename = para.template Get<std::string>("Wf1");
+      // if (Wf1_filename == "") util::PrintMsg("Using randomly generated Wf1");
+      // GUARD_CU(ReadMat(data_slice.W_f_1_1D, Wf1_filename, data_slice.Wf1_dim0,
+      //                  data_slice.Wf1_dim1));
 
-      std::string Wf1_filename = para.template Get<std::string>("Wf1");
-      if (Wf1_filename == "") util::PrintMsg("Using randomly generated Wf1");
-      GUARD_CU(ReadMat(data_slice.W_f_1_1D, Wf1_filename, data_slice.Wf1_dim0,
-                       data_slice.Wf1_dim1));
+      // std::string Wa1_filename = para.template Get<std::string>("Wa1");
+      // if (Wa1_filename == "") util::PrintMsg("Using randomly generated Wa1");
+      // GUARD_CU(ReadMat(data_slice.W_a_1_1D, Wa1_filename, data_slice.Wa1_dim0,
+      //                  data_slice.Wa1_dim1));
 
-      std::string Wa1_filename = para.template Get<std::string>("Wa1");
-      if (Wa1_filename == "") util::PrintMsg("Using randomly generated Wa1");
-      GUARD_CU(ReadMat(data_slice.W_a_1_1D, Wa1_filename, data_slice.Wa1_dim0,
-                       data_slice.Wa1_dim1));
+      // std::string Wf2_filename = para.template Get<std::string>("Wf2");
+      // if (Wf2_filename == "") util::PrintMsg("Using randomly generated Wf2");
+      // GUARD_CU(ReadMat(data_slice.W_f_2_1D, Wf2_filename, data_slice.Wf2_dim0,
+      //                  data_slice.Wf2_dim1));
 
-      std::string Wf2_filename = para.template Get<std::string>("Wf2");
-      if (Wf2_filename == "") util::PrintMsg("Using randomly generated Wf2");
-      GUARD_CU(ReadMat(data_slice.W_f_2_1D, Wf2_filename, data_slice.Wf2_dim0,
-                       data_slice.Wf2_dim1));
+      // std::string Wa2_filename = para.template Get<std::string>("Wa2");
+      // if (Wa2_filename == "") util::PrintMsg("Using randomly generated Wa2");
+      // GUARD_CU(ReadMat(data_slice.W_a_2_1D, Wa2_filename, data_slice.Wa2_dim0,
+      //                  data_slice.Wa2_dim1));
 
-      std::string Wa2_filename = para.template Get<std::string>("Wa2");
-      if (Wa2_filename == "") util::PrintMsg("Using randomly generated Wa2");
-      GUARD_CU(ReadMat(data_slice.W_a_2_1D, Wa2_filename, data_slice.Wa2_dim0,
-                       data_slice.Wa2_dim1));
+      // std::string features_filename =
+      //     para.template Get<std::string>("features");
+      // if (features_filename == "")
+      //   util::PrintMsg("Using randomly generated features");
+      // GUARD_CU(ReadMat(data_slice.features_1D, features_filename, graph.nodes,
+      //                  data_slice.feature_column));
 
-      std::string features_filename =
-          para.template Get<std::string>("features");
-      if (features_filename == "")
-        util::PrintMsg("Using randomly generated features");
-      GUARD_CU(ReadMat(data_slice.features_1D, features_filename, graph.nodes,
-                       data_slice.feature_column));
-
-      GUARD_CU(data_slice.W_f_1_1D.Move(util::HOST, util::DEVICE));
-      GUARD_CU(data_slice.W_a_1_1D.Move(util::HOST, util::DEVICE));
-      GUARD_CU(data_slice.W_f_2_1D.Move(util::HOST, util::DEVICE));
-      GUARD_CU(data_slice.W_a_2_1D.Move(util::HOST, util::DEVICE));
-      GUARD_CU(data_slice.features_1D.Move(util::HOST, util::DEVICE));
+      // GUARD_CU(data_slice.W_f_1_1D.Move(util::HOST, util::DEVICE));
+      // GUARD_CU(data_slice.W_a_1_1D.Move(util::HOST, util::DEVICE));
+      // GUARD_CU(data_slice.W_f_2_1D.Move(util::HOST, util::DEVICE));
+      // GUARD_CU(data_slice.W_a_2_1D.Move(util::HOST, util::DEVICE));
+      // GUARD_CU(data_slice.features_1D.Move(util::HOST, util::DEVICE));
       GUARD_CU2(cudaDeviceSynchronize(), "cudaDeviceSynchronize failed.");
     }  // end for (gpu)
 

@@ -150,6 +150,13 @@ cudaError_t UseParameters(util::Parameters &parameters) {
       __LINE__));
 
   GUARD_CU(parameters.Use<int>(
+        "batchnum", 
+        util::REQUIRED_ARGUMENT | util::MULTI_VALUE | util::OPTIONAL_PARAMETER,
+        util::PreDefinedValues<int>::InvalidValue,
+        "batches per epoch",
+        __FILE__, __LINE__));
+
+  GUARD_CU(parameters.Use<int>(
       "rand-seed",
       util::REQUIRED_ARGUMENT | util::SINGLE_VALUE | util::OPTIONAL_PARAMETER,
       util::PreDefinedValues<int>::InvalidValue,

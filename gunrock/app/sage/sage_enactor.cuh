@@ -77,19 +77,20 @@ __global__ void sage_kernel1(typename GraphT::VertexT source_start,
                                          s_child_degree);
     }
     __syncthreads();
+    
+    // skip feature computation 
+    // for (auto i = threadIdx.x; i < feature_column; i += blockDim.x) {
+    //   ValueT sum = 0;
+    //   for (int j = 0; j < num_leafs_per_child; j++)
+    //     sum += Load<F_LOAD>(features + (s_leafs[j] * feature_column + i));
+    //   sum /= num_leafs_per_child;
+    //   Store<S_STORE>(sums + (child_num * feature_column + i), sum);
 
-    for (auto i = threadIdx.x; i < feature_column; i += blockDim.x) {
-      ValueT sum = 0;
-      for (int j = 0; j < num_leafs_per_child; j++)
-        sum += Load<F_LOAD>(features + (s_leafs[j] * feature_column + i));
-      sum /= num_leafs_per_child;
-      Store<S_STORE>(sums + (child_num * feature_column + i), sum);
-
-      atomicAdd(sums_child_feat +
-                    (child_num / num_children_per_source * feature_column + i),
-                Load<F_LOAD>(features + (s_child * feature_column + i)) /
-                    num_children_per_source);
-    }
+    //   atomicAdd(sums_child_feat +
+    //                 (child_num / num_children_per_source * feature_column + i),
+    //             Load<F_LOAD>(features + (s_child * feature_column + i)) /
+    //                 num_children_per_source);
+    // }
     __syncthreads();
     child_num += gridDim.x;
   }
@@ -730,9 +731,9 @@ struct SAGEIterationLoop
     // util::PrintMsg("iter = " +
     // std::to_string(enactor_slice.enactor_stats.iteration)
     //    + ", batch_size = " + std::to_string(data_slice.batch_size)
-    //    + ", nodes = " + std::to_string(data_slice.sub_graph -> nodes));
-    if (enactor_slice.enactor_stats.iteration * data_slice.batch_size <
-        data_slice.sub_graph->nodes)
+    //    + ", batchnum = " + std::to_string(data_slice.batchnum);
+    if (enactor_slice.enactor_stats.iteration <
+        data_slice.batchnum)
       return false;
     return true;
   }
